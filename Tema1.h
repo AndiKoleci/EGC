@@ -51,7 +51,14 @@ namespace m1
         int bullets;
         int score;
         int maxscore;
-        int duckx;
-        int ducky;
+        float duckx;
+        float ducky;
+        float duckAngle;
+        int alive;
+        int escaped;
+        int newDuck;
+        float timeAlive;
+        int speed;
+        int dir;
     };
 }   //namespace m1

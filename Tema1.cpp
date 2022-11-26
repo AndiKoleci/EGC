@@ -89,10 +89,17 @@ void Tema1::CreateMesh(const char* name, const std::vector<VertexFormat>& vertic
 
 void Tema1::Init()
 {
-    lives = 1;
+    lives = 3;
     bullets = 3;
-    duckx = 375;
-    ducky = -125;
+    duckx = 400;
+    ducky = 300;
+    score = 0;
+    alive = 1;
+    escaped = 0;
+    timeAlive = 0;
+    newDuck = 0;
+    speed = 5;
+    duckAngle = AI_MATH_PI / 4;
     glm::ivec2 resolution = window->GetResolution();
     auto camera = GetSceneCamera();
     camera->SetOrthographic(0, (float)resolution.x, 0, (float)resolution.y, 0.01f, 400);
@@ -126,40 +133,40 @@ void Tema1::Init()
     vector<VertexFormat> vertices_beak
     {
         //BEAK
-        VertexFormat(glm::vec3(-75, 100,  0), glm::vec3(1, 1, 0), glm::vec3(0.2, 0.8, 0.6)),
+        VertexFormat(glm::vec3(100, -8.75,  0), glm::vec3(1, 1, 0), glm::vec3(0.2, 0.8, 0.6)),
         // TODO(student): Complete the vertices data for the cube mesh
-        VertexFormat(glm::vec3(-75, 150,  0), glm::vec3(1, 1, 0), glm::vec3(0.2, 0.8, 0.6)),
-        VertexFormat(glm::vec3(50, 125,  0), glm::vec3(1, 1, 0), glm::vec3(0.2, 0.8, 0.6)),
+        VertexFormat(glm::vec3(100, 8.75,  0), glm::vec3(1, 1, 0), glm::vec3(0.2, 0.8, 0.6)),
+        VertexFormat(glm::vec3(143.75, 0,  0), glm::vec3(1, 1, 0), glm::vec3(0.2, 0.8, 0.6)),
         //BEAK        
     };
 
     vector<VertexFormat> vertices_body
     {
         //BODY
-        VertexFormat(glm::vec3(-600, 25,  0), glm::vec3(0.258, 0.16, 0.117), glm::vec3(0.2, 0.8, 0.6)),
+        VertexFormat(glm::vec3(-88, -35,  0), glm::vec3(0.258, 0.16, 0.117), glm::vec3(0.2, 0.8, 0.6)),
         // TODO(student): Complete the vertices data for the cube mesh
-        VertexFormat(glm::vec3(-600, 225,  0), glm::vec3(0.258, 0.16, 0.117), glm::vec3(0.2, 0.8, 0.6)),
-        VertexFormat(glm::vec3(-100, 125,  0), glm::vec3(0.258, 0.16, 0.117), glm::vec3(0.2, 0.8, 0.6))
+        VertexFormat(glm::vec3(-88, 35,  0), glm::vec3(0.258, 0.16, 0.117), glm::vec3(0.2, 0.8, 0.6)),
+        VertexFormat(glm::vec3(88, 0,  0), glm::vec3(0.258, 0.16, 0.117), glm::vec3(0.2, 0.8, 0.6))
         //BODY
     };
 
     vector<VertexFormat> vertices_left
     {
         //LEFT
-        VertexFormat(glm::vec3(-450, 125,  1), glm::vec3(0.258, 0.16, 0.117), glm::vec3(0.2, 0.8, 0.6)),
+        VertexFormat(glm::vec3(-26.25, 0,  1), glm::vec3(0.258, 0.16, 0.117), glm::vec3(0.2, 0.8, 0.6)),
         // TODO(student): Complete the vertices data for the cube mesh
-        VertexFormat(glm::vec3(-400, 375,  1), glm::vec3(0.258, 0.16, 0.117), glm::vec3(0.2, 0.8, 0.6)),
-        VertexFormat(glm::vec3(-300, 125,  1), glm::vec3(0.258, 0.16, 0.117), glm::vec3(0.2, 0.8, 0.6))
+        VertexFormat(glm::vec3(-5, 87.5,  1), glm::vec3(0.258, 0.16, 0.117), glm::vec3(0.2, 0.8, 0.6)),
+        VertexFormat(glm::vec3(26.25, 0,  1), glm::vec3(0.258, 0.16, 0.117), glm::vec3(0.2, 0.8, 0.6))
         //LEFT
     };
 
     vector<VertexFormat> vertices_right
     {
         //RIGHT
-        VertexFormat(glm::vec3(-450, 125,  1), glm::vec3(0.258, 0.16, 0.117), glm::vec3(0.2, 0.8, 0.6)),
+        VertexFormat(glm::vec3(-26.25, 0,  1), glm::vec3(0.258, 0.16, 0.117), glm::vec3(0.2, 0.8, 0.6)),
         // TODO(student): Complete the vertices data for the cube mesh
-        VertexFormat(glm::vec3(-400, -125,  1), glm::vec3(0.258, 0.16, 0.117), glm::vec3(0.2, 0.8, 0.6)),
-        VertexFormat(glm::vec3(-300, 125,  1), glm::vec3(0.258, 0.16, 0.117), glm::vec3(0.2, 0.8, 0.6))
+        VertexFormat(glm::vec3(-5, -87.5,  1), glm::vec3(0.258, 0.16, 0.117), glm::vec3(0.2, 0.8, 0.6)),
+        VertexFormat(glm::vec3(26.25, 0,  1), glm::vec3(0.258, 0.16, 0.117), glm::vec3(0.2, 0.8, 0.6))
         //RIGHT
     };
 
@@ -190,34 +197,34 @@ void Tema1::Init()
     CreateMesh("body", vertices_body, indices_body);
     CreateMesh("left", vertices_left, indices_left);
     CreateMesh("right", vertices_right, indices_right);
-    Mesh* head = object2D::CreateCircle("head", glm::vec3(-112, 125, 1), 75, glm::vec3(0.062, 0.29, 0.125));
+    Mesh* head = object2D::CreateCircle("head", glm::vec3(90, 0, 1), 30, glm::vec3(0.062, 0.29, 0.125));
     AddMeshToList(head);
 
     //LIVES
     if (lives >= 1) {
-        Mesh* life1 = object2D::CreateCircle("life1", glm::vec3(-112, 125, 1), 25, glm::vec3(1, 0, 0));
+        Mesh* life1 = object2D::CreateCircle("life1", glm::vec3(0, 0, 2), 12.5, glm::vec3(1, 0, 0));
         AddMeshToList(life1);
     }
     if (lives >= 2) {
-        Mesh* life2 = object2D::CreateCircle("life2", glm::vec3(-112, 125, 1), 25, glm::vec3(1, 0, 0));
+        Mesh* life2 = object2D::CreateCircle("life2", glm::vec3(0, 0, 2), 12.5, glm::vec3(1, 0, 0));
         AddMeshToList(life2);
     }
     if (lives == 3) {
-        Mesh* life3 = object2D::CreateCircle("life3", glm::vec3(-112, 125, 1), 25, glm::vec3(1, 0, 0));
+        Mesh* life3 = object2D::CreateCircle("life3", glm::vec3(0, 0, 2), 12.5, glm::vec3(1, 0, 0));
         AddMeshToList(life3);
     }
     
     //BULLETS
     if (bullets >= 1) {
-        Mesh* bullet1 = object2D::CreateRect("bullet1", glm::vec3(-112, 125, 1), 35, 10, glm::vec3(0, 1, 0), false);
+        Mesh* bullet1 = object2D::CreateRect("bullet1", glm::vec3(-112, 125, 2), 35, 10, glm::vec3(0, 1, 0), false);
         AddMeshToList(bullet1);
     }
     if (bullets >= 2) {
-        Mesh* bullet2 = object2D::CreateRect("bullet2", glm::vec3(-112, 125, 1), 35, 10, glm::vec3(0, 1, 0), false);
+        Mesh* bullet2 = object2D::CreateRect("bullet2", glm::vec3(-112, 125, 2), 35, 10, glm::vec3(0, 1, 0), false);
         AddMeshToList(bullet2);
     }
     if (bullets == 3) {
-        Mesh* bullet3 = object2D::CreateRect("bullet3", glm::vec3(-112, 125, 1), 35, 10, glm::vec3(0, 1, 0), false);
+        Mesh* bullet3 = object2D::CreateRect("bullet3", glm::vec3(-112, 125, 2), 35, 10, glm::vec3(0, 1, 0), false);
         AddMeshToList(bullet3);
     }
 
@@ -226,13 +233,13 @@ void Tema1::Init()
     AddMeshToList(grass);
 
     //SCORE
-    Mesh* wireframe = object2D::CreateRect("wireframe", glm::vec3(0, 0, 1), 50, 200, glm::vec3(1, 1, 1), false);
+    Mesh* wireframe = object2D::CreateRect("wireframe", glm::vec3(0, 0, 2), 50, 200, glm::vec3(1, 1, 1), false);
     AddMeshToList(wireframe);
-    Mesh* scorebar = object2D::CreateRect("scorebar", glm::vec3(0, 0, 1), 49, 198, glm::vec3(0, 0, 1));
+    Mesh* scorebar = object2D::CreateRect("scorebar", glm::vec3(0, 0, 2), 49, 198, glm::vec3(0, 0, 1));
     AddMeshToList(scorebar);
 
     //HITBOX
-    Mesh* hitbox = object2D::CreateRect("hitbox", glm::vec3(-700, -150, 1), 550, 800, glm::vec3(1, 1, 1), false);
+    Mesh* hitbox = object2D::CreateRect("hitbox", glm::vec3(-150, -90, 1), 180, 300, glm::vec3(1, 1, 1), false);
     AddMeshToList(hitbox);
 }
 
@@ -258,8 +265,72 @@ void Tema1::Update(float deltaTimeSeconds)
     // add them over there!
 
     glClearColor(0.2, 0, 0.4, 1);
-    //duckx++;
-    //ducky++;
+
+    if (ducky <= 0 && alive==0) {
+        newDuck = 1;
+        alive = 1;
+        score++;
+        bullets = 3;
+        timeAlive = 0;
+        speed += 1;
+    }
+
+    if (ducky >= 710 && escaped == 1) {
+        newDuck = 1;
+        lives--;
+        escaped = 0;
+        timeAlive = 0;
+        bullets = 3;
+    }
+
+    if (alive == 1 && escaped == 0) {
+        duckx += cos(duckAngle) * speed;
+        ducky += sin(duckAngle) * speed;
+
+        timeAlive += deltaTimeSeconds;
+        if (timeAlive >= 5) {
+            escaped = 1;
+        }
+    }
+
+
+    if (alive == 0) ducky -= 8;
+    if (escaped == 1) ducky += 5;
+
+    if (duckx < -500 || duckx > 775) duckAngle = AI_MATH_PI - duckAngle;
+    if (duckx < -500) {
+        duckx = -500;
+    }
+    if (duckx > 775) {
+        duckx = 775;
+    }
+    
+    if (ducky < 0 || ducky > 715) duckAngle = -duckAngle;
+    if (ducky < 0) {
+        ducky = 0;
+    }
+    if (ducky > 715) {
+        ducky = 715;
+    }
+
+    if (newDuck == 1) {
+        newDuck = 0;
+        duckx = rand()%800-300;
+        ducky = 176;
+        duckAngle = (rand() % 52) + 52;
+        duckAngle /= 100;
+        dir = rand() % 2;
+        if (dir == 0) duckAngle += AI_MATH_PI/2;
+    }
+
+    if (score == 20) {
+        exit(0);
+    }
+
+   
+    
+    
+
     
     //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);     
 
@@ -320,9 +391,6 @@ void Tema1::Update(float deltaTimeSeconds)
 
     glm::ivec2 resolution = window->GetResolution();
 
-    modelMatrix = glm::mat3(1);
-    modelMatrix *= transform2D::Translate(500, 300) * transform2D::Scale(0.35, 0.35);
-
     //RenderMesh(meshes["cube_A"], shaders["VertexColor"], glm::vec3(resolution.x/2, resolution.y/2, 0), glm::vec3(0.25f));
     //RenderMesh(meshes["beak"], shaders["VertexColor"], glm::vec3(resolution.x / 2, resolution.y / 2, 0), glm::vec3(0.25f));
     /*RenderMesh(meshes["body"], shaders["VertexColor"], glm::vec3(resolution.x / 2, resolution.y / 2, 0), glm::vec3(0.25f));
@@ -334,7 +402,26 @@ void Tema1::Update(float deltaTimeSeconds)
     
     rot += deltaTimeSeconds;
     modelMatrix = glm::mat3(1);
-    modelMatrix *= transform2D::Translate(duckx-375, ducky+125) * transform2D::Translate(100, 400) /* * transform2D::Rotate(rot * AI_MATH_PI) */ * transform2D::Translate(110, -50) * transform2D::Scale(0.35, 0.35);
+    modelMatrix *= transform2D::Translate(duckx, ducky);
+    modelMatrix *= transform2D::Rotate(duckAngle);
+
+    if (alive == 0) {
+        modelMatrix = glm::mat3(1);
+        modelMatrix *= transform2D::Translate(duckx, ducky);
+        modelMatrix *= transform2D::Rotate(3 * AI_MATH_PI / 2);
+        //printf("Alive: %d, Escaped: %d\n", alive, escaped);
+        
+    }
+    
+    if (escaped == 1) {
+        modelMatrix = glm::mat3(1);
+        modelMatrix *= transform2D::Translate(duckx, ducky);
+        modelMatrix *= transform2D::Rotate(AI_MATH_PI / 2);
+
+    }
+    
+
+    //modelMatrix *= transform2D::Translate(duckx-375, ducky+125) * transform2D::Translate(100, 400) /* * transform2D::Rotate(rot * AI_MATH_PI) */ * transform2D::Translate(110, -50) * transform2D::Scale(0.35, 0.35);
     //^^ This kinda rotates well
   
 
@@ -343,66 +430,141 @@ void Tema1::Update(float deltaTimeSeconds)
     RenderMesh2D(meshes["head"], shaders["VertexColor"], modelMatrix);
     RenderMesh2D(meshes["hitbox"], shaders["VertexColor"], modelMatrix);
 
-
-    //cout << deltaTimeSeconds << "\n";
-    if(deltaTimeSeconds<0.25) angularStep += h * deltaTimeSeconds * AI_MATH_PI;
-    //else angularStep += h * M_PI;
+    if (escaped == 0 && alive == 1) {
+        if (angularStep >= AI_MATH_PI / 6) h = -1;
+        else if (angularStep <= 0) h = 1;
+        if (deltaTimeSeconds < 0.25) angularStep += h * deltaTimeSeconds * AI_MATH_PI;
+    }
+    
 
     modelMatrix = glm::mat3(1);
+    modelMatrix *= transform2D::Translate(duckx, ducky);
+    modelMatrix *= transform2D::Rotate(angularStep);
+    modelMatrix *= transform2D::Rotate(duckAngle);
+
+    if (alive == 0) {
+        modelMatrix = glm::mat3(1);
+        modelMatrix *= transform2D::Translate(duckx, ducky);
+        modelMatrix *= transform2D::Rotate(3 * AI_MATH_PI / 2);
+
+        
+    }
+    
+    if (escaped == 1) {
+        modelMatrix = glm::mat3(1);
+        if (angularStep >= AI_MATH_PI / 6) h = -1;
+        else if (angularStep <= 0) h = 1;
+        if (deltaTimeSeconds < 0.25) angularStep += h * deltaTimeSeconds * AI_MATH_PI;
+
+        modelMatrix *= transform2D::Translate(duckx, ducky);
+        modelMatrix *= transform2D::Rotate(AI_MATH_PI / 2);
+        modelMatrix *= transform2D::Rotate(angularStep);
+
+    
+    }
+    
+    RenderMesh2D(meshes["right"], shaders["VertexColor"], modelMatrix);
+
+    modelMatrix = glm::mat3(1);
+    modelMatrix *= transform2D::Translate(duckx, ducky);
+    modelMatrix *= transform2D::Rotate(-angularStep);
+    modelMatrix *= transform2D::Rotate(duckAngle);
+    if (alive == 0) {
+        modelMatrix = glm::mat3(1);
+        modelMatrix *= transform2D::Translate(duckx, ducky);
+        modelMatrix *= transform2D::Rotate(3 * AI_MATH_PI / 2);
+
+    }
+    
+    if (escaped == 1) {
+        modelMatrix = glm::mat3(1);
+        if (angularStep >= AI_MATH_PI / 6) h = -1;
+        else if (angularStep <= 0) h = 1;
+        if (deltaTimeSeconds < 0.25) angularStep += h * deltaTimeSeconds * AI_MATH_PI;
+
+        modelMatrix *= transform2D::Translate(duckx, ducky);
+        modelMatrix *= transform2D::Rotate(AI_MATH_PI / 2);
+        modelMatrix *= transform2D::Rotate(-angularStep);
+
+    }
+    
+
+    RenderMesh2D(meshes["left"], shaders["VertexColor"], modelMatrix);
+    //
+
+
+    //cout << deltaTimeSeconds << "\n";
+    //if(deltaTimeSeconds<0.25) angularStep += h * deltaTimeSeconds * AI_MATH_PI;
+    //else angularStep += h * M_PI;
+
+    /*
+    modelMatrix = glm::mat3(1);
     modelMatrix *= transform2D::Translate(100, 400);
-    //modelMatrix *= transform2D::Rotate(rot * AI_MATH_PI);
+    modelMatrix *= transform2D::Rotate(rot * AI_MATH_PI);
     modelMatrix *= transform2D::Translate(110, -50);
     modelMatrix *= transform2D::Scale(0.35, 0.35);
     modelMatrix *= transform2D::Translate(-375, 125);
     modelMatrix *= transform2D::Rotate(angularStep);
     modelMatrix *= transform2D::Translate(duckx, ducky);
+    */
 
-    RenderMesh2D(meshes["right"], shaders["VertexColor"], modelMatrix);
-
+    //RenderMesh2D(meshes["right"], shaders["VertexColor"], modelMatrix);
+    /*
     modelMatrix = glm::mat3(1);
     modelMatrix *= transform2D::Translate(100, 400);
-    //modelMatrix *= transform2D::Rotate(rot * AI_MATH_PI);
+    modelMatrix *= transform2D::Rotate(rot * AI_MATH_PI);
     modelMatrix *= transform2D::Translate(110, -50);
     modelMatrix *= transform2D::Scale(0.35, 0.35);
     modelMatrix *= transform2D::Translate(-375, 125);
     modelMatrix *= transform2D::Rotate(-angularStep);
     modelMatrix *= transform2D::Translate(duckx, ducky);
     RenderMesh2D(meshes["left"], shaders["VertexColor"], modelMatrix);
+    */
+    
+    if (lives >= 1) {
+        modelMatrix = glm::mat3(1);
+        modelMatrix *= transform2D::Translate(550, 685);
 
-    if (angularStep >= AI_MATH_PI / 6) h = -1;
-    else if (angularStep <= 0) h = 1;
+        RenderMesh2D(meshes["life1"], shaders["VertexColor"], modelMatrix);
+    }
 
-    modelMatrix = glm::mat3(1);
-    modelMatrix *= transform2D::Translate(600, 625) * transform2D::Scale(0.5, 0.5);
+    if (lives >= 2) {
+        modelMatrix = glm::mat3(1);
+        modelMatrix *= transform2D::Translate(590, 685);
+        RenderMesh2D(meshes["life2"], shaders["VertexColor"], modelMatrix);
+    }
+    
+    if (lives == 3) {
+        modelMatrix = glm::mat3(1);
+        modelMatrix *= transform2D::Translate(630, 685);
+        RenderMesh2D(meshes["life3"], shaders["VertexColor"], modelMatrix);
+    }
 
-    RenderMesh2D(meshes["life1"], shaders["VertexColor"], modelMatrix);
+    if (bullets >= 1) {
+        modelMatrix = glm::mat3(1);
+        modelMatrix *= transform2D::Translate(775, 545);
+        RenderMesh2D(meshes["bullet1"], shaders["VertexColor"], modelMatrix);
+    }
 
-    modelMatrix = glm::mat3(1);
-    modelMatrix *= transform2D::Translate(635, 625) * transform2D::Scale(0.5, 0.5);
-    RenderMesh2D(meshes["life2"], shaders["VertexColor"], modelMatrix);
+    if (bullets >= 2) {
+        modelMatrix = glm::mat3(1);
+        modelMatrix *= transform2D::Translate(810, 545);
+        RenderMesh2D(meshes["bullet2"], shaders["VertexColor"], modelMatrix);
+    }
 
-    modelMatrix = glm::mat3(1);
-    modelMatrix *= transform2D::Translate(670, 625) * transform2D::Scale(0.5, 0.5);
-    RenderMesh2D(meshes["life3"], shaders["VertexColor"], modelMatrix);
+    if (bullets == 3) {
+        modelMatrix = glm::mat3(1);
+        modelMatrix *= transform2D::Translate(845, 545);
+        RenderMesh2D(meshes["bullet3"], shaders["VertexColor"], modelMatrix);
+    }
 
-    modelMatrix = glm::mat3(1);
-    modelMatrix *= transform2D::Translate(775, 545);
-    RenderMesh2D(meshes["bullet1"], shaders["VertexColor"], modelMatrix);
-
-    modelMatrix = glm::mat3(1);
-    modelMatrix *= transform2D::Translate(810, 545);
-    RenderMesh2D(meshes["bullet2"], shaders["VertexColor"], modelMatrix);
-
-    modelMatrix = glm::mat3(1);
-    modelMatrix *= transform2D::Translate(845, 545);
-    RenderMesh2D(meshes["bullet3"], shaders["VertexColor"], modelMatrix);
 
     modelMatrix = glm::mat3(1);
     modelMatrix *= transform2D::Translate(540, 600); //-600 si -100 sunt coord colt stanga jos
     RenderMesh2D(meshes["wireframe"], shaders["VertexColor"], modelMatrix);
 
     modelMatrix = glm::mat3(1);
-    modelMatrix *= transform2D::Translate(541, 601) * transform2D::Scale(0, 1);
+    modelMatrix *= transform2D::Translate(541, 601) * transform2D::Scale(0.05 * score, 1);
     RenderMesh2D(meshes["scorebar"], shaders["VertexColor"], modelMatrix);
 
     //xleft: -600; xright: 1280
@@ -411,8 +573,7 @@ void Tema1::Update(float deltaTimeSeconds)
     modelMatrix = glm::mat3(1);
     modelMatrix *= transform2D::Translate(-600, -100); //-600 si -100 sunt coord colt stanga jos
     RenderMesh2D(meshes["grass"], shaders["VertexColor"], modelMatrix);
-
-    
+    if (lives == 0) exit(0);
 }
 
 
@@ -454,6 +615,13 @@ void Tema1::OnMouseBtnPress(int mouseX, int mouseY, int button, int mods)
 {
     // Add mouse button press event
     //TODO make duck die
+    alive = 0;
+    bullets--;
+    if (mouseX > duckx-150 && mouseX < duckx+150 && mouseY<720 - ducky - 90 && mouseY>720 - ducky - 90) {
+        printf("HIT\n", mouseX, mouseY);
+        
+    }
+    //printf("%d %d\n", mouseX, mouseY);
 }
 
 
