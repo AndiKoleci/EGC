@@ -50,7 +50,6 @@ namespace m1
         int lives;
         int bullets;
         int score;
-        int maxscore;
         float duckx;
         float ducky;
         float duckAngle;
