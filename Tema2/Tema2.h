@@ -16,6 +16,10 @@ namespace m1
 
      private:
         void FrameStart() override;
+        void DrawTrack();
+        void CreateCar(glm::mat4& modelMatrix);
+        void CreateGrass();
+        void CreateSky();
         void Update(float deltaTimeSeconds) override;
         void FrameEnd() override;
 
@@ -43,6 +47,9 @@ namespace m1
         float carX;
         float carZ;
         float carAngle;
+
+        float xCar;
+        float zCar;
 
     };
 }   // namespace m1

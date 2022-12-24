@@ -29,7 +29,7 @@ void Tema2::Init()
     renderCameraTarget = false;
 
     camera = new implemented::Camera();
-    camera->Set(glm::vec3(0, 2, 3.5f), glm::vec3(0, 1, 0), glm::vec3(0, 1, 0));
+    camera->Set(glm::vec3(0, 1.2, 3.5f), glm::vec3(0, 1, 0), glm::vec3(0, 1, 0));
 
     left = 0;
     right = 7;
@@ -67,6 +67,106 @@ void Tema2::Init()
 
 }
 
+void Tema2::CreateGrass() {
+    vector<VertexFormat> verticesGrass
+    {
+        VertexFormat(glm::vec3(-100, 0.8,  -100), glm::vec3(0.486, 0.85, 0.458)),
+        VertexFormat(glm::vec3(-100, 0.8,  100), glm::vec3(0.486, 0.85, 0.458)),
+        VertexFormat(glm::vec3(100, 0.8,  -100), glm::vec3(0.486, 0.85, 0.458)),
+        VertexFormat(glm::vec3(100, 0.8,  100), glm::vec3(0.486, 0.85, 0.458)),
+    };
+
+
+
+    vector<unsigned int> indicesGrass =
+    {
+        0, 1, 2,
+        1, 2, 3
+
+    };
+
+    Mesh* grass = new Mesh("grass");
+    grass->InitFromData(verticesGrass, indicesGrass);
+    RenderMesh(grass, shaders["VertexColor"], glm::mat4(1));
+}
+
+void Tema2::CreateSky() {
+    vector<VertexFormat> verticesSky
+    {
+        VertexFormat(glm::vec3(-100, 0.1,  -100), glm::vec3(0.431, 0.647, 1)),
+        VertexFormat(glm::vec3(-100, 0.1,  100), glm::vec3(0.431, 0.647, 1)),
+        VertexFormat(glm::vec3(100, 0.1,  -100), glm::vec3(0.431, 0.647, 1)),
+        VertexFormat(glm::vec3(100, 0.1,  100), glm::vec3(0.431, 0.647, 1)),
+        VertexFormat(glm::vec3(-100, 100,  -100), glm::vec3(0.431, 0.647, 1)),
+        VertexFormat(glm::vec3(-100, 100,  100), glm::vec3(0.431, 0.647, 1)),
+        VertexFormat(glm::vec3(100, 100,  -100), glm::vec3(0.431, 0.647, 1)),
+        VertexFormat(glm::vec3(100, 100,  100), glm::vec3(0.431, 0.647, 1)),
+    };
+
+
+
+    vector<unsigned int> indicesSky =
+    {
+        0, 1, 5,
+        0, 5, 4,
+        1, 3, 7,
+        1, 7, 5,
+        3, 2, 6, 
+        3, 6, 7,
+        2, 0, 4,
+        2, 4, 6
+
+    };
+
+    Mesh* sky = new Mesh("sky");
+    sky->InitFromData(verticesSky, indicesSky);
+    RenderMesh(sky, shaders["VertexColor"], glm::mat4(1));
+}
+
+void Tema2::CreateCar(glm::mat4 & modelMatrix)
+{
+    vector<VertexFormat> verticesCar
+    {
+        VertexFormat(glm::vec3(-0.05, 1,  -0.05), glm::vec3(1, 0, 0)),
+        VertexFormat(glm::vec3(-0.05, 1,  0.05), glm::vec3(1, 0, 0)),
+        VertexFormat(glm::vec3(0.05, 1,  -0.05), glm::vec3(1, 0, 0)),
+        VertexFormat(glm::vec3(0.05, 1,  0.05), glm::vec3(1, 0, 0)),
+        VertexFormat(glm::vec3(-0.05, 1.05,  -0.05), glm::vec3(1, 0, 0)),
+        VertexFormat(glm::vec3(-0.05, 1.05,  0.05), glm::vec3(1, 0, 0)),
+        VertexFormat(glm::vec3(0.05, 1.05,  -0.05), glm::vec3(1, 0, 0)),
+        VertexFormat(glm::vec3(0.05, 1.05,  0.05), glm::vec3(1, 0, 0)),
+    };
+
+
+
+    vector<unsigned int> indicesCar =
+    {
+        
+        0, 1, 5,
+        0, 5, 4,
+        1, 3, 7,
+        1, 7, 5,
+        3, 2, 6,
+        3, 6, 7,
+        2, 0, 4,
+        2, 4, 6,
+        4, 5, 7,
+        4, 7, 6
+        
+        /*
+        0, 1, 2,
+        3, 4, 5,
+        0, 6, 7
+        */
+    };
+
+
+
+    Mesh* car = new Mesh("car");
+    car->InitFromData(verticesCar, indicesCar);
+    RenderMesh(car, shaders["VertexColor"], modelMatrix);
+}
+
 
 void Tema2::FrameStart()
 {
@@ -79,35 +179,133 @@ void Tema2::FrameStart()
     glViewport(0, 0, resolution.x, resolution.y);
 }
 
+void Tema2::DrawTrack()
+{
+    vector<VertexFormat> vertices
+    {
+        VertexFormat(glm::vec3(-2.22, 1,  0.61), glm::vec3(0.258, 0.258, 0.258)),
+        VertexFormat(glm::vec3(-1.6, 1,  1.15), glm::vec3(0.258, 0.258, 0.258)),
+        VertexFormat(glm::vec3(-0.65, 1,  1.36), glm::vec3(0.258, 0.258, 0.258)),
+        VertexFormat(glm::vec3(0.16, 1,  1.17), glm::vec3(0.258, 0.258, 0.258)),
+        VertexFormat(glm::vec3(0.7, 1,  0.83), glm::vec3(0.258, 0.258, 0.258)),
+        VertexFormat(glm::vec3(1.06, 1,  0.43), glm::vec3(0.258, 0.258, 0.258)),
+        VertexFormat(glm::vec3(1.72, 1,  -0.07), glm::vec3(0.258, 0.258, 0.258)),
+        VertexFormat(glm::vec3(2.37, 1,  -0.08), glm::vec3(0.258, 0.258, 0.258)),
+        VertexFormat(glm::vec3(2.92, 1,  0.17), glm::vec3(0.258, 0.258, 0.258)),
+        VertexFormat(glm::vec3(3.51, 1,  0.3), glm::vec3(0.258, 0.258, 0.258)),
+        VertexFormat(glm::vec3(4.12, 1,  -0.18), glm::vec3(0.258, 0.258, 0.258)),
+        VertexFormat(glm::vec3(4.1, 1,  -0.91), glm::vec3(0.258, 0.258, 0.258)),
+        VertexFormat(glm::vec3(3.72, 1,  -1.21), glm::vec3(0.258, 0.258, 0.258)),
+        VertexFormat(glm::vec3(3.2, 1,  -1.32), glm::vec3(0.258, 0.258, 0.258)),
+        VertexFormat(glm::vec3(2.3, 1,  -1.42), glm::vec3(0.258, 0.258, 0.258)),
+        VertexFormat(glm::vec3(1.44, 1,  -1.59), glm::vec3(0.258, 0.258, 0.258)),
+        VertexFormat(glm::vec3(0.54, 1,  -1.63), glm::vec3(0.258, 0.258, 0.258)),
+        VertexFormat(glm::vec3(-0.26, 1,  -1.46), glm::vec3(0.258, 0.258, 0.258)),
+        VertexFormat(glm::vec3(-0.53, 1, -0.84), glm::vec3(0.258, 0.258, 0.258)),
+        VertexFormat(glm::vec3(-1.18, 1,  -0.6), glm::vec3(0.258, 0.258, 0.258)),
+        VertexFormat(glm::vec3(-1.86, 1,  -0.36), glm::vec3(0.258, 0.258, 0.258)),
+        VertexFormat(glm::vec3(-2.3, 1,  0.06), glm::vec3(0.258, 0.258, 0.258)),
+        VertexFormat(glm::vec3(-0.58, 1,  1.76), glm::vec3(0.258, 0.258, 0.258)),
+        VertexFormat(glm::vec3(0.28, 1,  1.59), glm::vec3(0.258, 0.258, 0.258)),
+        VertexFormat(glm::vec3(0.9, 1,  1.14), glm::vec3(0.258, 0.258, 0.258)),
+        VertexFormat(glm::vec3(1.3, 1,  0.75), glm::vec3(0.258, 0.258, 0.258)),
+        VertexFormat(glm::vec3(1.76, 1,  0.31), glm::vec3(0.258, 0.258, 0.258)),
+        VertexFormat(glm::vec3(2.38, 1,  0.31), glm::vec3(0.258, 0.258, 0.258)),
+        VertexFormat(glm::vec3(2.87, 1,  0.58), glm::vec3(0.258, 0.258, 0.258)),
+        VertexFormat(glm::vec3(3.56, 1,  0.74), glm::vec3(0.258, 0.258, 0.258)),
+        VertexFormat(glm::vec3(4.55, 1,  0.12), glm::vec3(0.258, 0.258, 0.258)),
+        VertexFormat(glm::vec3(4.59, 1,  -1.02), glm::vec3(0.258, 0.258, 0.258)),
+        VertexFormat(glm::vec3(4.1, 1,  -1.62), glm::vec3(0.258, 0.258, 0.258)),
+        VertexFormat(glm::vec3(3.38, 1,  -1.84), glm::vec3(0.258, 0.258, 0.258)),
+        VertexFormat(glm::vec3(2.37, 1,  -1.89), glm::vec3(0.258, 0.258, 0.258)),
+        VertexFormat(glm::vec3(1.5, 1,  -2), glm::vec3(0.258, 0.258, 0.258)),
+        VertexFormat(glm::vec3(0.5, 1,  -2), glm::vec3(0.258, 0.258, 0.258)),
+        VertexFormat(glm::vec3(-0.49, 1,  -1.8), glm::vec3(0.258, 0.258, 0.258)),
+        VertexFormat(glm::vec3(-0.89, 1,  -1.22), glm::vec3(0.258, 0.258, 0.258)),
+        VertexFormat(glm::vec3(-1.5, 1,  -1), glm::vec3(0.258, 0.258, 0.258)),
+        VertexFormat(glm::vec3(-2.24, 1,  -0.68), glm::vec3(0.258, 0.258, 0.258)),
+        VertexFormat(glm::vec3(-2.75, 1,  -0.12), glm::vec3(0.258, 0.258, 0.258)),
+        VertexFormat(glm::vec3(-2.83, 1,  0.64), glm::vec3(0.258, 0.258, 0.258)),
+        VertexFormat(glm::vec3(-1.82, 1,  1.67), glm::vec3(0.258, 0.258, 0.258))
+        
+    };
+
+    
+
+    vector<unsigned int> indices =
+    {
+        0, 1, 42, //a b s1
+        1, 43, 42, //b t1 s1
+        1, 2, 43, //b, c, t1
+        2, 22, 43, //
+        2, 3, 22,
+        3, 23, 22,
+        3, 4, 23,
+        4, 24, 23,
+        4, 5, 24,
+        5, 25, 24,
+        5, 6, 25,
+        6, 26, 25,
+        6, 7, 26,
+        7, 27, 26,
+        7, 8, 27,
+        8, 28, 27,
+        8, 9, 28,
+        9, 29, 28,
+        9, 10, 29,
+        10, 30, 29,
+        10, 11, 30,
+        11, 31, 30,
+        11, 12, 31,
+        12, 32, 31,
+        12, 13, 32,
+        13, 33, 32,
+        13, 14, 33,
+        14, 34, 33,
+        14, 15, 34,
+        15, 35, 34,
+        15, 16, 35,
+        16, 36, 35,
+        16, 17, 36,
+        17, 37, 36,
+        17, 18, 37,
+        18, 38, 37,
+        18, 19, 38,
+        19, 39, 38,
+        19, 20, 39,
+        20, 40, 39,
+        20, 21, 40,
+        21, 41, 40,
+        21, 0, 41,
+        0, 42, 41
+
+
+        //15, 16, 62
+    };
+
+
+    Mesh* track = new Mesh("track");
+    track->InitFromData(vertices, indices);
+    RenderMesh(track, shaders["VertexColor"], glm::mat4(1));
+}
+
 
 void Tema2::Update(float deltaTimeSeconds)
 {
-    {
-        glm::mat4 modelMatrix = glm::mat4(1);
-        modelMatrix = glm::translate(modelMatrix, glm::vec3(carZ, 0, carX));
-        modelMatrix = glm::rotate(modelMatrix, RADIANS(carAngle), glm::vec3(0, 1, 0));
 
-        RenderMesh(meshes["box"], shaders["VertexNormal"], modelMatrix);
-    }
+
+    DrawTrack();
+    CreateGrass();
+    CreateSky();
+    glm::mat4 modelMatrix = glm::mat4(1);
+    //modelMatrix = glm::translate(modelMatrix, glm::vec3(0.7, 0, 1));
+    modelMatrix = glm::translate(modelMatrix, camera->GetTargetPosition());
+    CreateCar(modelMatrix);
+    
 
     
+
     
-
-    // TODO(student): Draw more objects with different model matrices.
-    // Attention! The `RenderMesh()` function overrides the usual
-    // `RenderMesh()` that we've been using up until now. This new
-    // function uses the view matrix from the camera that you just
-    // implemented, and the local projection matrix.
-
-    // Render the camera target. This is useful for understanding where
-    // the rotation point is, when moving in third-person camera mode.
-    if (renderCameraTarget)
-    {
-        glm::mat4 modelMatrix = glm::mat4(1);
-        modelMatrix = glm::translate(modelMatrix, camera->GetTargetPosition());
-        modelMatrix = glm::scale(modelMatrix, glm::vec3(0.1f));
-        RenderMesh(meshes["sphere"], shaders["VertexNormal"], modelMatrix);
-    }
 }
 
 
