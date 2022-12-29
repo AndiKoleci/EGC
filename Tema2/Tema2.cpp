@@ -30,17 +30,14 @@ void Tema2::Init()
     renderCameraTarget = false;
 
     camera = new implemented::Camera();
-    camera->Set(glm::vec3(0, 1.1, 3.5f), glm::vec3(0, -0.7, 0), glm::vec3(0, 1, 0));
+    camera->Set(glm::vec3(-1.5, 1.2, 1.4f), glm::vec3(1.5, -0.7, -1.4), glm::vec3(0, 1, 0));
 
-    camera2 = new implemented::Camera();
-    camera2->Set(glm::vec3(0, 1, 0), glm::vec3(0, 1, 0), glm::vec3(1, 0, 0));
-
-    left = -3;
-    right = 3;
-    bottom = -2.5;
-    top = 2.5;
+    left = -2;
+    right = 2;
+    bottom = -2;
+    top = 2;
     zNear = 0.01f;
-    zFar = 40;
+    zFar = 50;
     fov = 50;
     persp = true;
     minFOV = 0.1f;
@@ -65,13 +62,6 @@ void Tema2::Init()
 
     // TODO(student): After you implement the changing of the projection
     // parameters, remove hardcodings of these parameters
-
-
-    projectionMatrix = glm::perspective(RADIANS(60), window->props.aspectRatio, 0.01f, 200.0f);
-    glm::ivec2 resolution = window->GetResolution();
-    miniViewportArea = ViewportArea(50, 50, resolution.x / 5.f, resolution.y / 5.f);
-
-
 
 }
 
@@ -396,6 +386,8 @@ void Tema2::RenderScene() {
     //modelMatrix = glm::translate(modelMatrix, glm::vec3(0.7, 0, 1));
     modelMatrix = glm::translate(modelMatrix, glm::vec3(camera->GetTargetPosition().x, camera->GetTargetPosition().y - 0.872, camera->GetTargetPosition().z));
     modelMatrix = glm::rotate(modelMatrix, carAngle, glm::vec3(0, 1, 0));
+    modelMatrix = glm::rotate(modelMatrix, RADIANS(-45), glm::vec3(0, 1, 0));
+
     CreateCar(modelMatrix);
     CreateTrees();
 }
@@ -408,12 +400,24 @@ void Tema2::Update(float deltaTimeSeconds)
     glPointSize(5);
 
     RenderScene();
+
+
+    
+    camera2 = camera;
+    camera = new implemented::Camera();
+    camera->Set(glm::vec3(camera2->GetTargetPosition().x, 1.5, camera2->GetTargetPosition().z), glm::vec3(camera2->GetTargetPosition().x, camera2->GetTargetPosition().y, camera2->GetTargetPosition().z), glm::vec3(1, 0, 0));
+
+    // projectionMatrix = glm::perspective(RADIANS(90), window->props.aspectRatio, 0.01f, 200.0f);
+    glm::ivec2 resolution = window->GetResolution();
+    miniViewportArea = ViewportArea(0, 0, resolution.x / 5.f, resolution.y / 5.f);
+
     projectionMatrix = glm::ortho(left, right, bottom, top, zNear, zFar);
     glClear(GL_DEPTH_BUFFER_BIT);
     glViewport(miniViewportArea.x, miniViewportArea.y, miniViewportArea.width, miniViewportArea.height);
 
     // TODO(student): render the scene again, in the new viewport
     RenderScene();
+    camera = camera2;
 }
 
 
