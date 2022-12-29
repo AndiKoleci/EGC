@@ -1,4 +1,5 @@
 #include "lab_m1/Tema2/Tema2.h"
+#include "lab_m1/lab4/lab4.h"
 
 #include <vector>
 #include <string>
@@ -29,14 +30,17 @@ void Tema2::Init()
     renderCameraTarget = false;
 
     camera = new implemented::Camera();
-    camera->Set(glm::vec3(0, 1.2, 3.5f), glm::vec3(0, 1, 0), glm::vec3(0, 1, 0));
+    camera->Set(glm::vec3(0, 1.1, 3.5f), glm::vec3(0, -0.7, 0), glm::vec3(0, 1, 0));
 
-    left = 0;
-    right = 7;
-    bottom = 0;
-    top = 5;
+    camera2 = new implemented::Camera();
+    camera2->Set(glm::vec3(0, 1, 0), glm::vec3(0, 1, 0), glm::vec3(1, 0, 0));
+
+    left = -3;
+    right = 3;
+    bottom = -2.5;
+    top = 2.5;
     zNear = 0.01f;
-    zFar = 100;
+    zFar = 40;
     fov = 50;
     persp = true;
     minFOV = 0.1f;
@@ -64,7 +68,102 @@ void Tema2::Init()
 
 
     projectionMatrix = glm::perspective(RADIANS(60), window->props.aspectRatio, 0.01f, 200.0f);
+    glm::ivec2 resolution = window->GetResolution();
+    miniViewportArea = ViewportArea(50, 50, resolution.x / 5.f, resolution.y / 5.f);
 
+
+
+}
+
+void Tema2::CreateTree(float x, float z) {
+    vector<VertexFormat> verticesTrunk
+    {
+        VertexFormat(glm::vec3(x-0.025, 1,  z-0.025), glm::vec3(0.36, 0.25, 0.109)),
+        VertexFormat(glm::vec3(x-0.025, 1,  z+0.025), glm::vec3(0.36, 0.25, 0.109)),
+        VertexFormat(glm::vec3(x+0.025, 1,  z-0.025), glm::vec3(0.36, 0.25, 0.109)),
+        VertexFormat(glm::vec3(x+0.025, 1,  z+0.025), glm::vec3(0.36, 0.25, 0.109)),
+        VertexFormat(glm::vec3(x-0.025, 1.075,  z-0.025), glm::vec3(0.36, 0.25, 0.109)),
+        VertexFormat(glm::vec3(x-0.025, 1.075,  z+0.025), glm::vec3(0.36, 0.25, 0.109)),
+        VertexFormat(glm::vec3(x+0.025, 1.075,  z-0.025), glm::vec3(0.36, 0.25, 0.109)),
+        VertexFormat(glm::vec3(x+0.025, 1.075,  z+0.025), glm::vec3(0.36, 0.25, 0.109)),
+    };
+
+    vector<VertexFormat> verticesLeaves
+    {
+        VertexFormat(glm::vec3(x - 0.075, 1.0751,  z - 0.075), glm::vec3(0.145, 0.368, 0.164)),
+        VertexFormat(glm::vec3(x - 0.075, 1.0751,  z + 0.075), glm::vec3(0.145, 0.368, 0.164)),
+        VertexFormat(glm::vec3(x + 0.075, 1.0751,  z - 0.075), glm::vec3(0.145, 0.368, 0.164)),
+        VertexFormat(glm::vec3(x + 0.075, 1.0751,  z + 0.075), glm::vec3(0.145, 0.368, 0.164)),
+        VertexFormat(glm::vec3(x - 0.075, 1.2,  z - 0.075), glm::vec3(0.145, 0.368, 0.164)),
+        VertexFormat(glm::vec3(x - 0.075, 1.2,  z + 0.075), glm::vec3(0.145, 0.368, 0.164)),
+        VertexFormat(glm::vec3(x + 0.075, 1.2,  z - 0.075), glm::vec3(0.145, 0.368, 0.164)),
+        VertexFormat(glm::vec3(x + 0.075, 1.2,  z + 0.075), glm::vec3(0.145, 0.368, 0.164)),
+    };
+
+    vector<unsigned int> indices=
+    {
+
+        0, 1, 5,
+        0, 5, 4,
+        1, 3, 7,
+        1, 7, 5,
+        3, 2, 6,
+        3, 6, 7,
+        2, 0, 4,
+        2, 4, 6,
+        4, 5, 7,
+        4, 7, 6,
+        0, 1, 3,
+        0, 3, 2
+    };
+
+
+
+    Mesh* trunk = new Mesh("trunk");
+    trunk->InitFromData(verticesTrunk, indices);
+    RenderMesh(trunk, shaders["VertexColor"], glm::mat4(1));
+    Mesh* leaves = new Mesh("leaves");
+    leaves->InitFromData(verticesLeaves, indices);
+    RenderMesh(leaves, shaders["VertexColor"], glm::mat4(1));
+}
+
+void Tema2::CreateTrees() {
+    CreateTree(0, 0);
+    CreateTree(-2.06, 0.67);
+    CreateTree(-2.79, 0.84);
+    CreateTree(-1.64, 1);
+    CreateTree(-2.1, 1.6);
+    //A
+    CreateTree(-1.03, 1.83);
+    CreateTree(-1.22, 1.12);
+    CreateTree(-0.31, 1.81);
+    CreateTree(-0.65, 1.23);
+    CreateTree(-0.06, 1.14);
+    CreateTree(0.91, 1.26);
+    CreateTree(1.32, 0.89);
+    CreateTree(0.97, 0.2);
+    CreateTree(2.03, 0.37);
+    CreateTree(2.87, 0.02);
+    CreateTree(3.69, 0.89);
+    CreateTree(4.8, 0.11);
+    CreateTree(4, -0.29);
+
+    CreateTree(4.83, -0.96);
+    CreateTree(4.39, -1.61);
+    CreateTree(3.55, -1.13);
+    CreateTree(2.88, -1.27);
+    CreateTree(3.6, -1.9);
+    CreateTree(2.68, -2.04);
+    CreateTree(2.02, -1.34);
+    CreateTree(1.57, -2.15);
+    CreateTree(0.51, -2.14);
+    CreateTree(-0.03, -1.33);
+    CreateTree(-0.91, -1.63);
+    CreateTree(-0.36, -0.77);
+    CreateTree(-1.04, -0.46);
+    CreateTree(-2.16, -0.89);
+    CreateTree(-2.73, -0.46);
+    CreateTree(-2.12, 0.13);
 }
 
 void Tema2::CreateGrass() {
@@ -127,14 +226,14 @@ void Tema2::CreateCar(glm::mat4 & modelMatrix)
 {
     vector<VertexFormat> verticesCar
     {
-        VertexFormat(glm::vec3(-0.05, 1,  -0.05), glm::vec3(1, 0, 0)),
-        VertexFormat(glm::vec3(-0.05, 1,  0.05), glm::vec3(1, 0, 0)),
-        VertexFormat(glm::vec3(0.05, 1,  -0.05), glm::vec3(1, 0, 0)),
-        VertexFormat(glm::vec3(0.05, 1,  0.05), glm::vec3(1, 0, 0)),
-        VertexFormat(glm::vec3(-0.05, 1.05,  -0.05), glm::vec3(1, 0, 0)),
-        VertexFormat(glm::vec3(-0.05, 1.05,  0.05), glm::vec3(1, 0, 0)),
-        VertexFormat(glm::vec3(0.05, 1.05,  -0.05), glm::vec3(1, 0, 0)),
-        VertexFormat(glm::vec3(0.05, 1.05,  0.05), glm::vec3(1, 0, 0)),
+        VertexFormat(glm::vec3(-0.025, 1,  -0.05), glm::vec3(0.011, 0.925, 0.988)),
+        VertexFormat(glm::vec3(-0.025, 1,  0.05), glm::vec3(0.011, 0.925, 0.988)),
+        VertexFormat(glm::vec3(0.025, 1,  -0.05), glm::vec3(0.011, 0.925, 0.988)),
+        VertexFormat(glm::vec3(0.025, 1,  0.05), glm::vec3(0.011, 0.925, 0.988)),
+        VertexFormat(glm::vec3(-0.025, 1.05,  -0.05), glm::vec3(0.011, 0.925, 0.988)),
+        VertexFormat(glm::vec3(-0.025, 1.05,  0.05), glm::vec3(0.011, 0.925, 0.988)),
+        VertexFormat(glm::vec3(0.025, 1.05,  -0.05), glm::vec3(0.011, 0.925, 0.988)),
+        VertexFormat(glm::vec3(0.025, 1.05,  0.05), glm::vec3(0.011, 0.925, 0.988)),
     };
 
 
@@ -289,29 +388,37 @@ void Tema2::DrawTrack()
     RenderMesh(track, shaders["VertexColor"], glm::mat4(1));
 }
 
-
-void Tema2::Update(float deltaTimeSeconds)
-{
-
-
+void Tema2::RenderScene() {
     DrawTrack();
     CreateGrass();
     CreateSky();
     glm::mat4 modelMatrix = glm::mat4(1);
     //modelMatrix = glm::translate(modelMatrix, glm::vec3(0.7, 0, 1));
-    modelMatrix = glm::translate(modelMatrix, camera->GetTargetPosition());
+    modelMatrix = glm::translate(modelMatrix, glm::vec3(camera->GetTargetPosition().x, camera->GetTargetPosition().y - 0.872, camera->GetTargetPosition().z));
+    modelMatrix = glm::rotate(modelMatrix, carAngle, glm::vec3(0, 1, 0));
     CreateCar(modelMatrix);
-    
+    CreateTrees();
+}
 
-    
 
-    
+void Tema2::Update(float deltaTimeSeconds)
+{
+    projectionMatrix = glm::perspective(RADIANS(60), window->props.aspectRatio, 0.01f, 200.0f);
+    glLineWidth(3);
+    glPointSize(5);
+
+    RenderScene();
+    projectionMatrix = glm::ortho(left, right, bottom, top, zNear, zFar);
+    glClear(GL_DEPTH_BUFFER_BIT);
+    glViewport(miniViewportArea.x, miniViewportArea.y, miniViewportArea.width, miniViewportArea.height);
+
+    // TODO(student): render the scene again, in the new viewport
+    RenderScene();
 }
 
 
 void Tema2::FrameEnd()
 {
-    DrawCoordinateSystem(camera->GetViewMatrix(), projectionMatrix);
 }
 
 
@@ -339,30 +446,28 @@ void Tema2::RenderMesh(Mesh * mesh, Shader * shader, const glm::mat4 & modelMatr
 void Tema2::OnInputUpdate(float deltaTime, int mods)
 {
     // move the camera only if MOUSE_RIGHT button is pressed
-    float cameraSpeed = 2.0f;
+    float cameraSpeed = 1.0f;
 
     if (window->KeyHold(GLFW_KEY_W)) {
         // TODO(student): Translate the camera forward
         camera->MoveForward(cameraSpeed * deltaTime);
-        carX -= cameraSpeed * deltaTime;
     }
 
     if (window->KeyHold(GLFW_KEY_A)) {
         // TODO(student): Translate the camera to the left
         camera->RotateThirdPerson_OY(cameraSpeed * deltaTime);
-        carAngle += cameraSpeed * deltaTime;
+        carAngle += deltaTime * cameraSpeed;
     }
 
     if (window->KeyHold(GLFW_KEY_S)) {
         // TODO(student): Translate the camera backward
-        camera->MoveForward(-cameraSpeed * deltaTime);
-        carX += cameraSpeed * deltaTime;
+        camera->MoveForward(-cameraSpeed/2 * deltaTime);
     }
 
     if (window->KeyHold(GLFW_KEY_D)) {
         // TODO(student): Translate the camera to the right
         camera->RotateThirdPerson_OY(-cameraSpeed * deltaTime);
-        carAngle -= cameraSpeed * deltaTime;
+        carAngle -= deltaTime * cameraSpeed;
     }
 
     // TODO(student): Change projection parameters. Declare any extra
