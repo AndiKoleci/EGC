@@ -1,25 +1,33 @@
 #pragma once
 
 #include "components/simple_scene.h"
-#include "lab_m1/lab5/lab_camera.h"
 
 
 namespace m1
 {
-    class Lab5 : public gfxc::SimpleScene
+    class Lab4 : public gfxc::SimpleScene
     {
-    public:
-        Lab5();
-        ~Lab5();
+     public:
+        struct ViewportArea
+        {
+            ViewportArea() : x(0), y(0), width(1), height(1) {}
+            ViewportArea(int x, int y, int width, int height)
+                : x(x), y(y), width(width), height(height) {}
+            int x;
+            int y;
+            int width;
+            int height;
+        };
+
+        Lab4();
+        ~Lab4();
 
         void Init() override;
 
-    private:
+     private:
         void FrameStart() override;
         void Update(float deltaTimeSeconds) override;
         void FrameEnd() override;
-
-        void RenderMesh(Mesh* mesh, Shader* shader, const glm::mat4& modelMatrix) override;
 
         void OnInputUpdate(float deltaTime, int mods) override;
         void OnKeyPress(int key, int mods) override;
@@ -30,16 +38,14 @@ namespace m1
         void OnMouseScroll(int mouseX, int mouseY, int offsetX, int offsetY) override;
         void OnWindowResize(int width, int height) override;
 
-    protected:
-        implemented::Camera* camera;
-        glm::mat4 projectionMatrix;
-        bool renderCameraTarget;
-
-        // TODO(student): If you need any other class variables, define them here.
-        float left, right, bottom, top, zNear, zFar;
-        float fov;
-        bool persp;
-        float minFOV, maxFOV;
-
+        void RenderScene();
+     protected:
+        glm::mat4 modelMatrix;
+        float translateX, translateY, translateZ;
+        float scaleX, scaleY, scaleZ;
+        float angularStepOX, angularStepOY, angularStepOZ;
+        GLenum polygonMode;
+        ViewportArea miniViewportArea;
     };
 }   // namespace m1
+

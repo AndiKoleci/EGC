@@ -1,25 +1,25 @@
 #pragma once
 
 #include "components/simple_scene.h"
-#include "lab_m1/lab5/lab_camera.h"
+#include "components/transform.h"
 
 
 namespace m1
 {
-    class Lab5 : public gfxc::SimpleScene
+    class Lab7 : public gfxc::SimpleScene
     {
-    public:
-        Lab5();
-        ~Lab5();
+     public:
+        Lab7();
+        ~Lab7();
 
         void Init() override;
 
-    private:
+     private:
         void FrameStart() override;
         void Update(float deltaTimeSeconds) override;
         void FrameEnd() override;
 
-        void RenderMesh(Mesh* mesh, Shader* shader, const glm::mat4& modelMatrix) override;
+        void RenderSimpleMesh(Mesh *mesh, Shader *shader, const glm::mat4 &modelMatrix, const glm::vec3 &color = glm::vec3(1));
 
         void OnInputUpdate(float deltaTime, int mods) override;
         void OnKeyPress(int key, int mods) override;
@@ -30,16 +30,9 @@ namespace m1
         void OnMouseScroll(int mouseX, int mouseY, int offsetX, int offsetY) override;
         void OnWindowResize(int width, int height) override;
 
-    protected:
-        implemented::Camera* camera;
-        glm::mat4 projectionMatrix;
-        bool renderCameraTarget;
-
-        // TODO(student): If you need any other class variables, define them here.
-        float left, right, bottom, top, zNear, zFar;
-        float fov;
-        bool persp;
-        float minFOV, maxFOV;
-
+        glm::vec3 lightPosition;
+        unsigned int materialShininess;
+        float materialKd;
+        float materialKs;
     };
 }   // namespace m1

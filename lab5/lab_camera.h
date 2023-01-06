@@ -8,17 +8,17 @@ namespace implemented
 {
     class Camera
     {
-     public:
+    public:
         Camera()
         {
-            position    = glm::vec3(0, 2, 5);
-            forward     = glm::vec3(0, 0, -1);
-            up          = glm::vec3(0, 1, 0);
-            right       = glm::vec3(1, 0, 0);
+            position = glm::vec3(0, 2, 5);
+            forward = glm::vec3(0, 0, -1);
+            up = glm::vec3(0, 1, 0);
+            right = glm::vec3(1, 0, 0);
             distanceToTarget = 2;
         }
 
-        Camera(const glm::vec3 &position, const glm::vec3 &center, const glm::vec3 &up)
+        Camera(const glm::vec3& position, const glm::vec3& center, const glm::vec3& up)
         {
             Set(position, center, up);
         }
@@ -27,12 +27,12 @@ namespace implemented
         { }
 
         // Update camera
-        void Set(const glm::vec3 &position, const glm::vec3 &center, const glm::vec3 &up)
+        void Set(const glm::vec3& position, const glm::vec3& center, const glm::vec3& up)
         {
             this->position = position;
-            forward     = glm::normalize(center - position);
-            right       = glm::cross(forward, up);
-            this->up    = glm::cross(right, forward);
+            forward = glm::normalize(center - position);
+            right = glm::cross(forward, up);
+            this->up = glm::cross(right, forward);
         }
 
         void MoveForward(float distance)
@@ -110,7 +110,7 @@ namespace implemented
             // to normalize the vectors!
             right = glm::normalize(glm::vec3(glm::rotate(glm::mat4(1.0f), angle, forward) * glm::vec4(right, 1)));
             up = glm::normalize(glm::cross(right, forward));
-            
+
         }
 
         void RotateThirdPerson_OX(float angle)
@@ -155,7 +155,7 @@ namespace implemented
             return position + forward * distanceToTarget;
         }
 
-     public:
+    public:
         float distanceToTarget;
         glm::vec3 position;
         glm::vec3 forward;
